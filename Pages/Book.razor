@@ -1,0 +1,205 @@
+@page "/book"
+@using AddictioonSnookerClub.Models
+@using AddictioonSnookerClub.Services
+@using AddictioonSnookerClub.Components
+@inject AppStateService State
+@inject BookingService BookingSvc
+
+<PageTitle>Book a Table – Addictioon Snooker Club</PageTitle>
+
+<div class="container page-container">
+    <div class="section-header">
+        <h1 class="section-title">Book a Table</h1>
+        <p class="section-sub">Select a table, pick your time, and you're set.</p>
+    </div>
+
+    @if (confirmed)
+    {
+        <!-- Confirmation Screen -->
+        <div class="confirm-screen">
+            <div class="card confirm-card">
+                <div class="confirm-icon">🎱</div>
+                <h2 class="confirm-title">Booking Confirmed!</h2>
+                <p class="confirm-sub">Your table is reserved. See you at the club!</p>
+
+                <div class="confirm-details">
+                    <div class="confirm-row"><span>Booking ID</span><strong>@bookingId</strong></div>
+                    <div class="confirm-row"><span>Table</span><strong>@selectedTable!.Name @(selectedTable.Type==TableType.VIP?"(VIP)":"")</strong></div>
+                    <div class="confirm-row"><span>Date</span><strong>@selectedDate.ToString("dd MMM yyyy")</strong></div>
+                    <div class="confirm-row"><span>Time</span><strong>@selectedTime</strong></div>
+                    <div class="confirm-row"><span>Duration</span><strong>@duration hour@(duration>1?"s":"")</strong></div>
+                    <div class="confirm-row confirm-total"><span>Total</span><strong>₹@Total</strong></div>
+                </div>
+
+                <p class="confirm-note">📱 Show this at reception. QR code sent to your registered email.</p>
+                <button class="btn-ghost btn-full mt-2" @onclick="Reset">Book Another Table</button>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Step Indicator -->
+        <div class="steps-row">
+            @for (int i = 1; i <= 3; i++)
+            {
+                var si = i;
+                var label = si switch { 1 => "Select Table", 2 => "Choose Time", _ => "Confirm" };
+                <div class="step-group">
+                    <div class="step-circle @(step > si ? "step-done" : step == si ? "step-active" : "")">
+                        @(step > si ? "✓" : si.ToString())
+                    </div>
+                    <span class="step-label @(step == si ? "step-label-active" : "")">@label</span>
+                </div>
+                @if (si < 3)
+                {
+                    <div class="step-line @(step > si ? "step-line-done" : "")"></div>
+                }
+            }
+        </div>
+
+        <!-- Step 1: Select Table -->
+        @if (step == 1)
+        {
+            <h3 class="step-heading">Select an Available Table</h3>
+            <div class="tables-grid">
+                @foreach (var table in State.Tables)
+                {
+                    <SnookerTableCard Table="table"
+                                      Selected="selectedTable?.Id == table.Id"
+                                      OnSelect="t => selectedTable = t" />
+                }
+            </div>
+            <div class="step-nav">
+                <button class="btn-primary" disabled="@(selectedTable == null)"
+                        @onclick="() => step = 2">
+                    Next: Choose Time →
+                </button>
+            </div>
+        }
+
+        <!-- Step 2: Date / Time / Duration -->
+        @if (step == 2)
+        {
+            <div class="time-form">
+                <div class="form-group">
+                    <label>Date</label>
+                    <input class="form-input" type="date"
+                           min="@DateTime.Today.ToString("yyyy-MM-dd")"
+                           @bind="selectedDate" />
+                </div>
+
+                <div class="form-group">
+                    <label>Time Slot</label>
+                    <div class="slots-grid">
+                        @foreach (var slot in State.TimeSlots)
+                        {
+                            var s = slot;
+                            <button class="slot-btn @(selectedTime == s ? "slot-active" : "")"
+                                    @onclick="() => selectedTime = s">@s</button>
+                        }
+                    </div>
+                </div>
+
+                <div class="form-group duration-group">
+                    <label>Duration</label>
+                    <select class="form-input" @bind="duration">
+                        @for (int d = 1; d <= 5; d++)
+                        {
+                            var dv = d;
+                            <option value="@dv">@dv hour@(dv > 1 ? "s" : "")</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            @if (selectedTable != null && selectedDate != default && selectedTime != "")
+            {
+                <div class="card summary-card">
+                    <p class="summary-title">Booking Summary</p>
+                    <div class="summary-rows">
+                        <div class="summary-row"><span>Table</span><span>@selectedTable.Name @(selectedTable.Type==TableType.VIP?"(VIP)":"")</span></div>
+                        <div class="summary-row"><span>Date</span><span>@selectedDate.ToString("dd MMM yyyy")</span></div>
+                        <div class="summary-row"><span>Time</span><span>@selectedTime</span></div>
+                        <div class="summary-row"><span>Duration</span><span>@duration h</span></div>
+                        <div class="summary-row"><span>Rate</span><span>₹@selectedTable.HourlyRate/hr</span></div>
+                        <div class="summary-row summary-total"><span>Total</span><span>₹@Total</span></div>
+                    </div>
+                </div>
+            }
+
+            <div class="step-nav">
+                <button class="btn-ghost" @onclick="() => step = 1">← Back</button>
+                <button class="btn-primary"
+                        disabled="@(selectedDate == default || selectedTime == "")"
+                        @onclick="() => step = 3">
+                    Next: Confirm →
+                </button>
+            </div>
+        }
+
+        <!-- Step 3: Confirm -->
+        @if (step == 3)
+        {
+            <div class="confirm-form">
+                <h3 class="step-heading">Confirm Your Booking</h3>
+                <div class="card confirm-preview">
+                    <div class="confirm-details">
+                        <div class="confirm-row"><span>Table</span><strong>@selectedTable!.Name @(selectedTable.Type==TableType.VIP?"(VIP)":"")</strong></div>
+                        <div class="confirm-row"><span>Date</span><strong>@selectedDate.ToString("dd MMM yyyy")</strong></div>
+                        <div class="confirm-row"><span>Time</span><strong>@selectedTime</strong></div>
+                        <div class="confirm-row"><span>Duration</span><strong>@duration hour@(duration>1?"s":"")</strong></div>
+                        <div class="confirm-row"><span>Rate</span><strong>₹@selectedTable.HourlyRate/hr</strong></div>
+                        <div class="confirm-row confirm-total"><span>Total</span><strong>₹@Total</strong></div>
+                    </div>
+                </div>
+                <p class="confirm-note">Payment is collected at the venue. Free cancellation up to 2 hours before your booking.</p>
+                <div class="step-nav">
+                    <button class="btn-ghost" @onclick="() => step = 2">← Back</button>
+                    <button class="btn-primary" @onclick="Confirm">Confirm Booking 🎱</button>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    int step = 1;
+    SnookerTable? selectedTable;
+    DateTime selectedDate = DateTime.Today;
+    string selectedTime = "";
+    int duration = 1;
+    bool confirmed = false;
+    string bookingId = "";
+
+    int Total => selectedTable != null ? selectedTable.HourlyRate * duration : 0;
+
+    void Confirm()
+    {
+        var booking = new Booking
+        {
+            TableId      = selectedTable!.Id,
+            TableName    = selectedTable.Name,
+            MemberName   = "Guest",
+            MemberEmail  = "",
+            Date         = selectedDate,
+            TimeSlot     = selectedTime,
+            DurationHours= duration,
+            Amount       = Total,
+            Status       = BookingStatus.Confirmed,
+        };
+        bookingId = BookingSvc.CreateBooking(booking);
+        confirmed = true;
+        State.ShowToast("Booking confirmed! See you at the club. 🎱");
+    }
+
+    void Reset()
+    {
+        step = 1;
+        selectedTable = null;
+        selectedDate = DateTime.Today;
+        selectedTime = "";
+        duration = 1;
+        confirmed = false;
+        bookingId = "";
+    }
+}

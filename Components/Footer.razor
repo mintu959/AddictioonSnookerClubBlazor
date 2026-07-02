@@ -1,0 +1,50 @@
+@namespace AddictioonSnookerClub.Components
+@using AddictioonSnookerClub.Services
+@inject AppStateService State
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div>
+                <div class="footer-brand">
+                    <span>🎱</span>
+                    <span class="brand-name">Addicti<span class="brand-accent">oo</span>n</span>
+                </div>
+                <p class="footer-tagline">Nagpur's finest snooker club.<br/>Where every frame counts.</p>
+            </div>
+            <div>
+                <h4 class="footer-heading">Quick Links</h4>
+                <nav class="footer-links">
+                    <a href="/">Home</a>
+                    <a href="/about">About</a>
+                    <a href="/pricing">Pricing</a>
+                    <a href="/book">Book a Table</a>
+                    <a href="/tournaments">Tournaments</a>
+                    <a href="/contact">Contact</a>
+                </nav>
+            </div>
+            <div>
+                <h4 class="footer-heading">Contact</h4>
+                <div class="footer-contact">
+                    <a href="@State.Business.GoogleMapsUrl" target="_blank" rel="noopener noreferrer">
+                        📍 @State.Business.Address
+                    </a>
+                    <a href="tel:@State.Business.PhoneRaw">📞 @State.Business.Phone</a>
+                    <a href="mailto:@State.Business.Email">📧 @State.Business.Email</a>
+                    <span>🕐 @State.Business.Hours</span>
+                </div>
+            </div>
+            <div>
+                <h4 class="footer-heading">Follow Us</h4>
+                <a href="@State.Business.InstagramUrl" target="_blank" rel="noopener noreferrer" class="footer-instagram">
+                    <span style="font-size:22px">📸</span>
+                    <span>@State.Business.InstagramHandle</span>
+                </a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2026 Addictioon Snooker Club. All rights reserved.</span>
+            <span>Made with ❤️ in Nagpur</span>
+        </div>
+    </div>
+</footer>

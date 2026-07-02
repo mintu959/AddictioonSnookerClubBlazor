@@ -1,0 +1,82 @@
+@namespace AddictioonSnookerClub.Components
+@using AddictioonSnookerClub.Models
+@using AddictioonSnookerClub.Services
+@inject MemberService Members
+
+<div class="modal-backdrop" @onclick="OnClose.InvokeAsync">
+    <div class="modal-card" @onclick:stopPropagation>
+        <div class="modal-header">
+            <div class="modal-icon">🎱</div>
+            <h2>@(isLogin ? "Welcome Back" : "Join the Club")</h2>
+            <p>@(isLogin ? "Sign in to your account" : "Create a free account")</p>
+        </div>
+
+        <div class="form-group">
+            @if (!isLogin)
+            {
+                <label>Full Name</label>
+                <input class="form-input" @bind="fullName" placeholder="Your name" />
+            }
+            <label>Email</label>
+            <input class="form-input" type="email" @bind="email" placeholder="you@example.com" />
+            <label>Password</label>
+            <input class="form-input" type="password" @bind="password" placeholder="••••••••" />
+
+            @if (error != null)
+            {
+                <p class="form-error">@error</p>
+            }
+
+            <button class="btn-primary btn-full" @onclick="Submit">
+                @(isLogin ? "Sign In" : "Create Account")
+            </button>
+
+            <p class="auth-toggle">
+                @(isLogin ? "No account? " : "Have an account? ")
+                <span @onclick="() => { isLogin = !isLogin; error = null; }">
+                    @(isLogin ? "Register" : "Sign In")
+                </span>
+            </p>
+            <p class="auth-hint">
+                💡 Tip: use <strong>admin</strong> email for admin access, or any other email for member.
+            </p>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public EventCallback<string> OnClose { get; set; }
+    [Parameter] public EventCallback<User> OnLogin { get; set; }
+
+    bool isLogin = true;
+    string email = "";
+    string password = "";
+    string fullName = "";
+    string? error;
+
+    async Task Submit()
+    {
+        if (string.IsNullOrWhiteSpace(email)) { error = "Email is required."; return; }
+        if (string.IsNullOrWhiteSpace(password)) { error = "Password is required."; return; }
+
+        // Determine role from email (demo logic)
+        string role = email.Contains("admin") ? "admin"
+                    : email.Contains("staff") ? "staff"
+                    : "member";
+
+        // Try to find existing member, else create demo user
+        var existing = Members.GetByEmail(email);
+        var user = existing ?? new User
+        {
+            Id = Random.Shared.Next(100, 9999),
+            Name = isLogin ? (email.Split('@')[0]) : (string.IsNullOrWhiteSpace(fullName) ? email.Split('@')[0] : fullName),
+            Email = email,
+            Role = role,
+            Membership = role == "admin" ? "Platinum" : "Silver",
+            LoyaltyPoints = Random.Shared.Next(50, 500),
+            JoinedDate = DateTime.Now,
+        };
+
+        await OnLogin.InvokeAsync(user);
+    }
+}

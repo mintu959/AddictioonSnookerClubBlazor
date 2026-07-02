@@ -1,0 +1,243 @@
+@page "/admin"
+@using AddictioonSnookerClub.Models
+@using AddictioonSnookerClub.Services
+@using AddictioonSnookerClub.Components
+@inject AppStateService State
+@inject BookingService BookingSvc
+@inject MemberService MemberSvc
+@implements IDisposable
+
+<PageTitle>Admin – Addictioon Snooker Club</PageTitle>
+
+@if (!State.IsAdmin)
+{
+    <div class="container page-container text-center">
+        <div style="font-size:3rem;margin-bottom:1rem">🚫</div>
+        <h2 style="color:#F0EAD6">Admin access required</h2>
+        <a href="/" class="btn-primary">Go to Home</a>
+    </div>
+}
+else
+{
+    <div class="dashboard-shell">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-profile">
+                <div class="sidebar-name gold">⚙️ Admin Panel</div>
+                <div class="muted small">Addictioon HQ</div>
+            </div>
+            <nav class="sidebar-nav">
+                @foreach (var tab in AdminTabs)
+                {
+                    <button class="sidebar-link @(activeTab==tab.Id?"sidebar-active-gold":"")"
+                            @onclick="() => activeTab = tab.Id">
+                        <span>@tab.Icon</span> @tab.Label
+                    </button>
+                }
+            </nav>
+        </aside>
+
+        <!-- Content -->
+        <div class="dashboard-content">
+
+            <!-- OVERVIEW -->
+            @if (activeTab == "overview")
+            {
+                <h2 class="dash-heading">Dashboard Overview</h2>
+                <div class="stats-grid">
+                    <StatCard Icon="👥" Label="Total Members"    Value="@MemberSvc.TotalCount.ToString()" Sub="+14 this month"/>
+                    <StatCard Icon="📅" Label="Active Bookings"  Value="@BookingSvc.ActiveBookingsCount.ToString()" Sub="Right now" AccentColor="#C9A84C"/>
+                    <StatCard Icon="💰" Label="Today's Revenue"  Value="@($"₹{BookingSvc.TodayRevenue.ToString("N0")}")" Sub="@($"{BookingSvc.ActiveBookingsCount} bookings")" AccentColor="#2ECC71"/>
+                    <StatCard Icon="📈" Label="Monthly Revenue"  Value="₹1.34L" Sub="+11% vs last month" AccentColor="#C9A84C"/>
+                    <StatCard Icon="🟢" Label="Tables Open"      Value="5 / 8"  Sub="3 occupied"          AccentColor="#2ECC71"/>
+                    <StatCard Icon="🏆" Label="Tournaments"      Value="2"      Sub="Upcoming"             AccentColor="#2980B9"/>
+                </div>
+                <h3 class="dash-sub-heading">Revenue — Last 6 Months</h3>
+                <div class="card">
+                    <BarChart Data="State.RevenueHistory" Height="180" />
+                </div>
+            }
+
+            <!-- BOOKINGS -->
+            @if (activeTab == "bookings")
+            {
+                <h2 class="dash-heading">Booking Management</h2>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>ID</th><th>Member</th><th>Table</th><th>Date</th><th>Time</th><th>Dur.</th><th>Amount</th><th>Status</th><th>Actions</th></tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var b in BookingSvc.GetAll())
+                            {
+                                <tr>
+                                    <td class="mono muted">@b.Id</td>
+                                    <td>@b.MemberName</td>
+                                    <td>@b.TableName</td>
+                                    <td>@b.Date.ToString("dd MMM")</td>
+                                    <td>@b.TimeSlot</td>
+                                    <td>@b.DurationHours h</td>
+                                    <td class="mono gold">₹@b.Amount</td>
+                                    <td><span class="badge @StatusClass(b.Status)">@b.Status</span></td>
+                                    <td>
+                                        <div class="action-btns">
+                                            <button class="btn-icon">✏️</button>
+                                            <button class="btn-icon" @onclick="() => BookingSvc.DeleteBooking(b.Id)">🗑</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+            <!-- MEMBERS -->
+            @if (activeTab == "members")
+            {
+                <div class="dash-top-row">
+                    <h2 class="dash-heading">Member Management</h2>
+                    <button class="btn-primary">+ Add Member</button>
+                </div>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>Name</th><th>Email</th><th>Membership</th><th>Points</th><th>Joined</th><th>Status</th><th>Actions</th></tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var m in MemberSvc.GetAll())
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="member-cell">
+                                            <div class="member-avatar-sm">@m.Initials</div>
+                                            @m.Name
+                                        </div>
+                                    </td>
+                                    <td class="muted">@m.Email</td>
+                                    <td><span class="badge badge-gold">@m.Membership</span></td>
+                                    <td class="mono emerald">@m.LoyaltyPoints.ToString("N0")</td>
+                                    <td class="muted">@m.JoinedDate.ToString("dd MMM yyyy")</td>
+                                    <td>
+                                        <span class="glow-dot-inline"
+                                              style="background:@(m.IsActive?"#2ECC71":"#8B8BA7");box-shadow:0 0 5px @(m.IsActive?"#2ECC71":"#8B8BA7")">
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="action-btns">
+                                            <button class="btn-icon">✏️</button>
+                                            <button class="btn-icon" @onclick="() => MemberSvc.DeleteMember(m.Id)">🗑</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+            <!-- TABLES -->
+            @if (activeTab == "tables")
+            {
+                <h2 class="dash-heading">Table Management</h2>
+                <div class="admin-tables-grid">
+                    @foreach (var t in State.Tables)
+                    {
+                        <div class="card text-center">
+                            <div style="font-size:2.5rem;margin-bottom:.5rem">🎱</div>
+                            <div class="booking-table">@t.Name</div>
+                            <span class="badge @StatusTableClass(t.Status) mt-1">@t.Status</span>
+                            @if (t.Type == TableType.VIP)
+                            {
+                                <span class="badge badge-gold mt-1">VIP</span>
+                            }
+                            <button class="btn-ghost btn-full mt-2" style="font-size:12px">Edit Status</button>
+                        </div>
+                    }
+                </div>
+            }
+
+            <!-- TOURNAMENTS -->
+            @if (activeTab == "tournaments")
+            {
+                <div class="dash-top-row">
+                    <h2 class="dash-heading">Tournament Management</h2>
+                    <button class="btn-primary">+ Create Tournament</button>
+                </div>
+                @foreach (var t in State.Tournaments)
+                {
+                    <div class="card booking-row mb-2">
+                        <div>
+                            <div class="booking-table">@t.Name</div>
+                            <div class="booking-meta">
+                                📅 @t.Date.ToString("dd MMM yyyy") ·
+                                @t.RegisteredPlayers/@t.MaxPlayers players ·
+                                Prize: @t.PrizeMoney
+                            </div>
+                        </div>
+                        <div class="booking-actions">
+                            <span class="badge @(t.Status==TournamentStatus.Upcoming?"badge-green":"badge-gold")">@t.Status</span>
+                            <button class="btn-ghost" style="font-size:13px">✏️ Edit</button>
+                            <button class="btn-danger-sm">🗑</button>
+                        </div>
+                    </div>
+                }
+            }
+
+            <!-- REVENUE -->
+            @if (activeTab == "revenue")
+            {
+                <h2 class="dash-heading">Revenue Reports</h2>
+                <div class="stats-grid">
+                    <StatCard Icon="💰" Label="This Month"       Value="₹1.34L"  Sub="+11% MoM"/>
+                    <StatCard Icon="📊" Label="This Year"        Value="₹11.3L"  Sub="Jan–Jun 2026"   AccentColor="#C9A84C"/>
+                    <StatCard Icon="🎱" Label="Booking Revenue"  Value="₹8.2L"   Sub="61% of total"   AccentColor="#2980B9"/>
+                    <StatCard Icon="💳" Label="Memberships"      Value="₹3.1L"   Sub="39% of total"   AccentColor="#2ECC71"/>
+                </div>
+                <div class="card mt-2">
+                    <h3 class="card-title">Monthly Revenue</h3>
+                    <BarChart Data="State.RevenueHistory" Height="200" />
+                </div>
+                <div class="export-btns mt-2">
+                    <button class="btn-ghost">📥 Export PDF</button>
+                    <button class="btn-ghost">📊 Export Excel</button>
+                </div>
+            }
+
+        </div>
+    </div>
+}
+
+@code {
+    string activeTab = "overview";
+
+    readonly (string Id, string Icon, string Label)[] AdminTabs =
+    {
+        ("overview",    "📊", "Overview"),
+        ("bookings",    "📅", "Bookings"),
+        ("members",     "👥", "Members"),
+        ("tables",      "🎱", "Tables"),
+        ("tournaments", "🏆", "Tournaments"),
+        ("revenue",     "💰", "Revenue"),
+    };
+
+    string StatusClass(BookingStatus s) => s switch
+    {
+        BookingStatus.Confirmed  => "badge-green",
+        BookingStatus.Cancelled  => "badge-red",
+        BookingStatus.Pending    => "badge-gold",
+        BookingStatus.Completed  => "badge-green",
+        _ => ""
+    };
+
+    string StatusTableClass(TableStatus s) => s switch
+    {
+        TableStatus.Available   => "badge-green",
+        TableStatus.Occupied    => "badge-red",
+        TableStatus.Maintenance => "badge-yellow",
+        _ => ""
+    };
+
+    protected override void OnInitialized() => State.OnChange += StateHasChanged;
+    public void Dispose() => State.OnChange -= StateHasChanged;
+}

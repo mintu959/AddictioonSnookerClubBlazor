@@ -1,0 +1,161 @@
+@page "/"
+@using AddictioonSnookerClub.Models
+@using AddictioonSnookerClub.Services
+@using AddictioonSnookerClub.Components
+@inject AppStateService State
+@inject NavigationManager Nav
+
+<PageTitle>Addictioon Snooker Club – Mumbai's Premier Snooker Destination</PageTitle>
+
+<!-- ═══ HERO ═══════════════════════════════════════════════ -->
+<section class="hero">
+    <div class="hero-bg-grid"></div>
+    <div class="hero-content">
+        <div class="hero-text">
+            <p class="hero-eyebrow">Mumbai's Premier Snooker Destination</p>
+            <h1 class="hero-title">
+                Master Your<br />
+                <span class="text-emerald">Game</span> at<br />
+                Addictioon
+            </h1>
+            <p class="hero-sub">
+                8 professional-grade tables, VIP lounges, and a community of players
+                who take the game seriously. Open daily 10&nbsp;AM&nbsp;– 2&nbsp;AM.
+            </p>
+            <div class="hero-cta">
+                <a href="/book" class="btn-primary">Book a Table →</a>
+                <a href="/about" class="btn-ghost">Explore the Club</a>
+            </div>
+            <div class="hero-stats">
+                <div class="hero-stat"><span class="hero-stat-n">8</span><span>Tables</span></div>
+                <div class="hero-stat"><span class="hero-stat-n">1200+</span><span>Members</span></div>
+                <div class="hero-stat"><span class="hero-stat-n">50+</span><span>Tournaments</span></div>
+            </div>
+        </div>
+
+        <div class="hero-rack" aria-hidden="true">
+            <svg viewBox="0 0 100 110" class="billiard-rack">
+                @{
+                    var balls = new (double cx, double cy, string color, string num)[]
+                    {
+                        (50,20,"#F9D71C","1"),(34,35,"#2980B9","2"),(66,35,"#E74C3C","3"),
+                        (18,50,"#E91E8C","4"),(50,50,"#222222","8"),(82,50,"#27AE60","6"),
+                        (2,65,"#795548","7"),(34,65,"#16A085","5"),(66,65,"#E67E22","9"),
+                        (98,65,"#8E44AD","10"),
+                    };
+                    int bi = 0;
+                }
+
+                @foreach (var (cx, cy, color, num) in balls)
+                {
+                    <g class="ball ball-@bi">
+                        <circle cx="@cx" cy="@cy" r="11" fill="@color" stroke="rgba(255,255,255,0.15)" stroke-width="0.5" />
+                        <circle cx="@cx" cy="@cy" r="5" fill="rgba(255,255,255,0.85)" />
+                        <text x="@cx" y="@(cy + 4)" text-anchor="middle" font-size="5" font-weight="bold"
+                              fill="@(color == "#222222" ? "#fff" : "#111")">@num</text>
+                    </g>
+                    bi++;
+                }
+            </svg>
+        </div>
+    </div>
+</section>
+
+<!-- ═══ TABLE AVAILABILITY PREVIEW ═══════════════════════ -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <p class="section-eyebrow">Live Status</p>
+            <h2 class="section-title">Table Availability</h2>
+        </div>
+        <div class="tables-grid">
+            @foreach (var table in State.Tables)
+            {
+                <SnookerTableCard Table="table" Selected="false" OnSelect="@(() => Nav.NavigateTo("/book"))" />
+            }
+        </div>
+        <div class="section-cta">
+            <a href="/book" class="btn-primary">Book Now →</a>
+        </div>
+    </div>
+</section>
+
+<!-- ═══ MEMBERSHIP ════════════════════════════════════════ -->
+<section class="section section-dark">
+    <div class="container">
+        <div class="section-header">
+            <p class="section-eyebrow">Join the Club</p>
+            <h2 class="section-title">Membership Plans</h2>
+        </div>
+        <div class="plans-grid">
+            @foreach (var plan in State.MembershipPlans)
+            {
+                <MembershipCard Plan="plan" OnSelect="@(() => Nav.NavigateTo("/pricing"))" />
+            }
+        </div>
+    </div>
+</section>
+
+<!-- ═══ TOURNAMENTS ═══════════════════════════════════════ -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <p class="section-eyebrow">Compete</p>
+            <h2 class="section-title">Upcoming Tournaments</h2>
+        </div>
+        <div class="tournament-grid">
+            @foreach (var t in State.Tournaments)
+            {
+                <div class="card tournament-card">
+                    <div class="tournament-top">
+                        <span class="badge @(t.Status == TournamentStatus.Upcoming ? "badge-green" : "badge-gold")">
+                            @t.Status
+                        </span>
+                        <span class="prize-badge">@t.PrizeMoney</span>
+                    </div>
+                    <h3 class="tournament-name">@t.Name</h3>
+                    <p class="tournament-date">📅 @t.Date.ToString("dd MMM yyyy")</p>
+                    <div class="progress-row">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width:@((double)t.RegisteredPlayers / t.MaxPlayers * 100)%"></div>
+                        </div>
+                        <span class="progress-label">@t.RegisteredPlayers/@t.MaxPlayers</span>
+                    </div>
+                    @if (t.Winner != null)
+                    {
+                        <p class="winner-label">🏆 @t.Winner</p>
+                    }
+                    @if (t.Status == TournamentStatus.Upcoming)
+                    {
+                        <a href="/tournaments" class="btn-primary btn-full mt-2">Register Now</a>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- ═══ TESTIMONIALS ══════════════════════════════════════ -->
+<section class="section section-dark">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">What Our Members Say</h2>
+        </div>
+        <div class="testimonial-grid">
+            @foreach (var t in State.Testimonials)
+            {
+                <div class="card glass-card testimonial-card">
+                    <div class="quote-mark">"</div>
+                    <p class="testimonial-text">@t.Text</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">@t.Initials</div>
+                        <div>
+                            <div class="author-name">@t.Name</div>
+                            <div class="author-role">@t.Role</div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>

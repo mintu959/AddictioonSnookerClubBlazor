@@ -1,0 +1,35 @@
+@namespace AddictioonSnookerClub.Components
+@using AddictioonSnookerClub.Models
+
+<div class="membership-card @(Plan.IsPopular ? "membership-popular" : "")"
+     style="--plan-color: @Plan.Color">
+
+    @if (Plan.IsPopular)
+    {
+        <div class="popular-badge">MOST POPULAR</div>
+    }
+
+    <div class="plan-icon">@Plan.Icon</div>
+    <div class="plan-tier" style="color:@Plan.Color">@Plan.Tier</div>
+    <div class="plan-price">
+        ₹@Plan.MonthlyPrice.ToString("N0")
+        <span class="plan-period">/month</span>
+    </div>
+
+    <ul class="plan-perks">
+        @foreach (var perk in Plan.Perks)
+        {
+            <li><span class="perk-check">✓</span> @perk</li>
+        }
+    </ul>
+
+    <button class="@(Plan.IsPopular ? "btn-gold" : "btn-ghost") btn-full"
+            @onclick="() => OnSelect.InvokeAsync(Plan)">
+        Choose @Plan.Tier
+    </button>
+</div>
+
+@code {
+    [Parameter] public MembershipPlan Plan { get; set; } = null!;
+    [Parameter] public EventCallback<MembershipPlan> OnSelect { get; set; }
+}

@@ -1,0 +1,56 @@
+@page "/pricing"
+@using AddictioonSnookerClub.Services
+@using AddictioonSnookerClub.Components
+@inject AppStateService State
+@inject NavigationManager Nav
+
+<PageTitle>Pricing – Addictioon Snooker Club</PageTitle>
+
+<div class="container page-container">
+    <div class="section-header">
+        <p class="section-eyebrow">Transparent Pricing</p>
+        <h1 class="section-title">Table Rates</h1>
+    </div>
+
+    <!-- Hourly rates -->
+    <div class="rates-grid">
+        @foreach (var r in Rates)
+        {
+            <div class="card rate-card">
+                <div class="rate-icon">@r.icon</div>
+                <h3 class="rate-label">@r.label</h3>
+                <div class="rate-price">@r.price</div>
+                <p class="rate-sub">@r.sub</p>
+            </div>
+        }
+    </div>
+
+    <!-- Membership plans -->
+    <div class="section-header mt-4">
+        <h2 class="section-title">Membership Plans</h2>
+        <p class="section-sub">Save more with a monthly plan — discounts, free hours, and priority booking.</p>
+    </div>
+
+    <div class="plans-grid">
+        @foreach (var plan in State.MembershipPlans)
+        {
+            <MembershipCard Plan="plan" OnSelect="HandlePlanSelect" />
+        }
+    </div>
+</div>
+
+@code {
+    readonly (string icon, string label, string price, string sub)[] Rates = new[]
+    {
+        ("🟢","Standard Table", "₹300/hr",  "Mon–Fri, 10 AM – 6 PM"),
+        ("🔴","Peak Hours",     "₹400/hr",  "Mon–Fri, 6 PM – 2 AM"),
+        ("📅","Weekend Rate",   "₹450/hr",  "Sat–Sun, all day"),
+        ("👑","VIP Room",       "₹500/hr",  "Private room, anytime"),
+        ("🎓","Student Rate",   "₹250/hr",  "Valid ID required, weekdays only"),
+    };
+
+    void HandlePlanSelect(AddictioonSnookerClub.Models.MembershipPlan plan)
+    {
+        Nav.NavigateTo("/dashboard");
+    }
+}

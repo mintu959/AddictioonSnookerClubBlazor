@@ -1,0 +1,27 @@
+@* ═══════════════════════════════════════════════════════════
+   Shared UI Components — used across all pages
+   ═══════════════════════════════════════════════════════════ *@
+
+@* ── StatCard ─────────────────────────────────────────── *@
+@namespace AddictioonSnookerClub.Components
+
+<div class="stat-card">
+    <div class="stat-top">
+        <span class="stat-icon">@Icon</span>
+        <span class="glow-dot" style="background:@AccentColor; box-shadow: 0 0 6px @AccentColor"></span>
+    </div>
+    <div class="stat-value">@Value</div>
+    <div class="stat-label">@Label</div>
+    @if (Sub != null)
+    {
+        <div class="stat-sub" style="color:@AccentColor">@Sub</div>
+    }
+</div>
+
+@code {
+    [Parameter] public string Icon { get; set; } = "";
+    [Parameter] public string Label { get; set; } = "";
+    [Parameter] public string Value { get; set; } = "";
+    [Parameter] public string? Sub { get; set; }
+    [Parameter] public string AccentColor { get; set; } = "#2ECC71";
+}

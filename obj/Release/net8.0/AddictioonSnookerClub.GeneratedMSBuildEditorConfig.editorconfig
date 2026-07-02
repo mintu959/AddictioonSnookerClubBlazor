@@ -1,0 +1,95 @@
+is_global = true
+build_property.EnableAotAnalyzer = 
+build_property.EnableSingleFileAnalyzer = 
+build_property.EnableTrimAnalyzer = false
+build_property.IncludeAllContentForSelfExtract = 
+build_property.TargetFramework = net8.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = 
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = false
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = browser
+build_property.RootNamespace = AddictioonSnookerClub
+build_property.RootNamespace = AddictioonSnookerClub
+build_property.ProjectDir = /Users/mithileshpandey/MyAppData/AddictioonSnookerClubBlazor/
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = false
+build_property.RazorLangVersion = 8.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = /Users/mithileshpandey/MyAppData/AddictioonSnookerClubBlazor
+build_property._RazorSourceGeneratorDebug = 
+
+[/Users/mithileshpandey/MyAppData/AddictioonSnookerClubBlazor/App.razor]
+build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/mithileshpandey/MyAppData/AddictioonSnookerClubBlazor/Components/AuthModal.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BdXRoTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/mithileshpandey/MyAppData/AddictioonSnookerClubBlazor/Components/BarChart.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9CYXJDaGFydC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/mithileshpandey/MyAppData/AddictioonSnookerClubBlazor/Components/Footer.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9Gb290ZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/mithileshpandey/MyAppData/AddictioonSnookerClubBlazor/Components/MembershipCard.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9NZW1iZXJzaGlwQ2FyZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/mithileshpandey/MyAppData/AddictioonSnookerClubBlazor/Components/SnookerTableCard.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9Tbm9va2VyVGFibGVDYXJkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/mithileshpandey/MyAppData/AddictioonSnookerClubBlazor/Components/StatCard.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TdGF0Q2FyZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/mithileshpandey/MyAppData/AddictioonSnookerClubBlazor/Layout/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = TGF5b3V0L01haW5MYXlvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/mithileshpandey/MyAppData/AddictioonSnookerClubBlazor/Pages/About.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWJvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/mithileshpandey/MyAppData/AddictioonSnookerClubBlazor/Pages/Admin.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/mithileshpandey/MyAppData/AddictioonSnookerClubBlazor/Pages/Book.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQm9vay5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/mithileshpandey/MyAppData/AddictioonSnookerClubBlazor/Pages/Contact.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ29udGFjdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/mithileshpandey/MyAppData/AddictioonSnookerClubBlazor/Pages/Dashboard.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvRGFzaGJvYXJkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/mithileshpandey/MyAppData/AddictioonSnookerClubBlazor/Pages/Gallery.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvR2FsbGVyeS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/mithileshpandey/MyAppData/AddictioonSnookerClubBlazor/Pages/Index.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSW5kZXgucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/mithileshpandey/MyAppData/AddictioonSnookerClubBlazor/Pages/Pricing.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJpY2luZy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/mithileshpandey/MyAppData/AddictioonSnookerClubBlazor/Pages/Tournaments.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvVG91cm5hbWVudHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/mithileshpandey/MyAppData/AddictioonSnookerClubBlazor/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 

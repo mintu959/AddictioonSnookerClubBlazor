@@ -1,0 +1,47 @@
+@namespace AddictioonSnookerClub.Components
+@using AddictioonSnookerClub.Models
+
+<div class="table-card @(Selected ? "table-selected" : "") @(Table.Status == TableStatus.Available ? "table-available-card" : "")"
+     @onclick="HandleClick" role="button" tabindex="0">
+
+    <div class="table-felt">
+        <div class="felt-cue-ball"></div>
+        @if (Table.Status == TableStatus.Occupied)
+        {
+            <div class="felt-overlay felt-occupied"></div>
+        }
+        @if (Table.Status == TableStatus.Maintenance)
+        {
+            <span class="felt-maintenance">🔧</span>
+        }
+    </div>
+
+    <div class="table-name">@Table.Name</div>
+
+    <span class="badge @StatusBadgeClass">@Table.Status</span>
+
+    @if (Table.Type == TableType.VIP)
+    {
+        <span class="badge badge-gold mt-1">VIP</span>
+    }
+</div>
+
+@code {
+    [Parameter] public SnookerTable Table { get; set; } = null!;
+    [Parameter] public bool Selected { get; set; }
+    [Parameter] public EventCallback<SnookerTable> OnSelect { get; set; }
+
+    string StatusBadgeClass => Table.Status switch
+    {
+        TableStatus.Available    => "badge-green",
+        TableStatus.Occupied     => "badge-red",
+        TableStatus.Maintenance  => "badge-yellow",
+        _ => ""
+    };
+
+    async Task HandleClick()
+    {
+        if (Table.Status == TableStatus.Available)
+            await OnSelect.InvokeAsync(Table);
+    }
+}

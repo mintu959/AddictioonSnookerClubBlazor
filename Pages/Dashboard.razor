@@ -1,0 +1,230 @@
+@page "/dashboard"
+@using AddictioonSnookerClub.Models
+@using AddictioonSnookerClub.Services
+@using AddictioonSnookerClub.Components
+@inject AppStateService State
+@inject BookingService BookingSvc
+@inject NavigationManager Nav
+@implements IDisposable
+
+<PageTitle>My Dashboard – Addictioon Snooker Club</PageTitle>
+
+@if (!State.IsAuthenticated)
+{
+    <div class="container page-container text-center">
+        <div style="font-size:3rem;margin-bottom:1rem">🔒</div>
+        <h2 style="color:#F0EAD6">Sign in to access your dashboard</h2>
+        <a href="/" class="btn-primary">Go to Home</a>
+    </div>
+}
+else
+{
+    <div class="dashboard-shell">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-profile">
+                <div class="sidebar-avatar">@State.CurrentUser!.Initials</div>
+                <div class="sidebar-name">@State.CurrentUser.Name</div>
+                <span class="badge badge-gold">@State.CurrentUser.Membership Member</span>
+            </div>
+            <nav class="sidebar-nav">
+                @foreach (var tab in MemberTabs)
+                {
+                    <button class="sidebar-link @(activeTab==tab.Id?"sidebar-active":"")"
+                            @onclick="() => activeTab = tab.Id">
+                        <span>@tab.Icon</span> @tab.Label
+                    </button>
+                }
+            </nav>
+        </aside>
+
+        <!-- Content -->
+        <div class="dashboard-content">
+
+            @if (activeTab == "overview")
+            {
+                <h2 class="dash-heading">Welcome back, @State.CurrentUser!.Name!&nbsp;👋</h2>
+                <div class="stats-grid">
+                    <StatCard Icon="⭐" Label="Loyalty Points"    Value="@State.CurrentUser.LoyaltyPoints.ToString("N0")" Sub="+120 this month" AccentColor="#C9A84C"/>
+                    <StatCard Icon="📅" Label="Upcoming Bookings" Value="2"     Sub="Next: Today 16:00"    AccentColor="#C9A84C"/>
+                    <StatCard Icon="💳" Label="Membership"        Value="@State.CurrentUser.Membership" Sub="Expires Dec 2026" AccentColor="#C9A84C"/>
+                    <StatCard Icon="🎱" Label="Hours Played"      Value="48"    Sub="This month: 8 h"      AccentColor="#2980B9"/>
+                </div>
+                <h3 class="dash-sub-heading">Upcoming Bookings</h3>
+                @foreach (var b in BookingSvc.GetAll().Where(b => b.Status == BookingStatus.Confirmed).Take(2))
+                {
+                    <div class="card booking-row">
+                        <div>
+                            <div class="booking-table">@b.TableName</div>
+                            <div class="booking-meta">@b.Date.ToString("dd MMM") at @b.TimeSlot · @b.DurationHours h</div>
+                        </div>
+                        <div class="booking-actions">
+                            <span class="badge badge-green">@b.Status</span>
+                            <span class="booking-amount">₹@b.Amount</span>
+                            <button class="btn-danger-sm" @onclick="() => CancelBooking(b.Id)">Cancel</button>
+                        </div>
+                    </div>
+                }
+            }
+
+            @if (activeTab == "bookings")
+            {
+                <h2 class="dash-heading">My Bookings</h2>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>ID</th><th>Table</th><th>Date</th><th>Time</th><th>Duration</th><th>Amount</th><th>Status</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var b in BookingSvc.GetAll())
+                            {
+                                <tr>
+                                    <td class="mono muted">@b.Id</td>
+                                    <td>@b.TableName</td>
+                                    <td>@b.Date.ToString("dd MMM")</td>
+                                    <td>@b.TimeSlot</td>
+                                    <td>@b.DurationHours h</td>
+                                    <td class="mono gold">₹@b.Amount</td>
+                                    <td><span class="badge @StatusClass(b.Status)">@b.Status</span></td>
+                                    <td>
+                                        @if (b.Status == BookingStatus.Confirmed)
+                                        {
+                                            <button class="btn-danger-sm" @onclick="() => CancelBooking(b.Id)">Cancel</button>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+            @if (activeTab == "membership")
+            {
+                <h2 class="dash-heading">Membership</h2>
+                <div class="card membership-status-card">
+                    <div class="membership-status-top">
+                        <div>
+                            <div style="font-size:3rem">🥇</div>
+                            <h3 class="gold">@State.CurrentUser!.Membership Membership</h3>
+                            <p class="muted">Active until December 31, 2026</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="muted small">Monthly fee</div>
+                            <div class="big-price">₹1,799</div>
+                            <button class="btn-gold mt-2">Renew Now</button>
+                        </div>
+                    </div>
+                </div>
+                <h3 class="dash-sub-heading">Upgrade to Platinum</h3>
+                <div class="card">
+                    <div class="upgrade-row">
+                        <div>
+                            <div class="booking-table">💎 Platinum — ₹2,999/month</div>
+                            <div class="booking-meta">Unlimited VIP · 10 free hours · Private locker · Monthly coaching</div>
+                        </div>
+                        <button class="btn-primary">Upgrade</button>
+                    </div>
+                </div>
+            }
+
+            @if (activeTab == "rewards")
+            {
+                <h2 class="dash-heading">Rewards & Loyalty</h2>
+                <div class="stats-grid">
+                    <StatCard Icon="⭐" Label="Total Points"  Value="@State.CurrentUser!.LoyaltyPoints.ToString("N0")" Sub="Lifetime earned"/>
+                    <StatCard Icon="🎁" Label="Free Hours"    Value="3 h"  Sub="Redeemable now" AccentColor="#C9A84C"/>
+                    <StatCard Icon="👥" Label="Referrals"     Value="5"    Sub="+500 pts earned" AccentColor="#2980B9"/>
+                </div>
+                <div class="card mt-2">
+                    <h3 class="card-title">How to Earn Points</h3>
+                    @foreach (var (action, pts) in RewardRules)
+                    {
+                        <div class="reward-row">
+                            <span class="muted">@action</span>
+                            <span class="emerald mono">@pts</span>
+                        </div>
+                    }
+                </div>
+            }
+
+            @if (activeTab == "profile")
+            {
+                <h2 class="dash-heading">Profile</h2>
+                <div class="card" style="max-width:480px">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input class="form-input" @bind="editName" />
+                        <label>Email</label>
+                        <input class="form-input" type="email" @bind="editEmail" />
+                        <label>Phone</label>
+                        <input class="form-input" @bind="editPhone" placeholder="+91 98765 43210" />
+                        <button class="btn-primary mt-2" @onclick="SaveProfile">Save Changes</button>
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+}
+
+@code {
+    string activeTab = "overview";
+    string editName = "";
+    string editEmail = "";
+    string editPhone = "";
+
+    protected override void OnInitialized()
+    {
+        State.OnChange += StateHasChanged;
+        if (State.CurrentUser != null)
+        {
+            editName  = State.CurrentUser.Name;
+            editEmail = State.CurrentUser.Email;
+        }
+    }
+
+    readonly (string Id, string Icon, string Label)[] MemberTabs =
+    {
+        ("overview",   "🏠", "Overview"),
+        ("bookings",   "📅", "My Bookings"),
+        ("membership", "💳", "Membership"),
+        ("rewards",    "⭐", "Rewards"),
+        ("profile",    "👤", "Profile"),
+    };
+
+    readonly (string action, string pts)[] RewardRules =
+    {
+        ("Every hour booked",         "+10 pts"),
+        ("Membership renewal",        "+200 pts"),
+        ("Tournament participation",  "+50 pts"),
+        ("Refer a friend",            "+100 pts"),
+    };
+
+    void CancelBooking(string id)
+    {
+        BookingSvc.CancelBooking(id);
+        State.ShowToast("Booking cancelled.");
+    }
+
+    void SaveProfile()
+    {
+        if (State.CurrentUser != null)
+        {
+            State.CurrentUser.Name  = editName;
+            State.CurrentUser.Email = editEmail;
+            State.ShowToast("Profile updated successfully.");
+        }
+    }
+
+    string StatusClass(BookingStatus s) => s switch
+    {
+        BookingStatus.Confirmed  => "badge-green",
+        BookingStatus.Cancelled  => "badge-red",
+        BookingStatus.Pending    => "badge-gold",
+        BookingStatus.Completed  => "badge-green",
+        _ => ""
+    };
+
+    public void Dispose() => State.OnChange -= StateHasChanged;
+}

@@ -1,0 +1,100 @@
+@inherits LayoutComponentBase
+@using AddictioonSnookerClub.Services
+@using AddictioonSnookerClub.Components
+@inject AppStateService State
+@inject NavigationManager Nav
+@implements IDisposable
+
+<div class="app-shell">
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <a href="/" class="brand">
+            <span class="brand-icon">🎱</span>
+            <span class="brand-name">Addicti<span class="brand-accent">oo</span>n</span>
+        </a>
+
+        <!-- Desktop links -->
+        <div class="nav-links @(menuOpen ? "nav-open" : "")">
+            <NavLink href="/" Match="NavLinkMatch.All" class="nav-link" ActiveClass="nav-active">Home</NavLink>
+            <NavLink href="/about"       class="nav-link" ActiveClass="nav-active">About</NavLink>
+            <NavLink href="/pricing"     class="nav-link" ActiveClass="nav-active">Pricing</NavLink>
+            <NavLink href="/gallery"     class="nav-link" ActiveClass="nav-active">Gallery</NavLink>
+            <NavLink href="/tournaments" class="nav-link" ActiveClass="nav-active">Tournaments</NavLink>
+            <NavLink href="/book"        class="nav-link nav-book" ActiveClass="nav-active">Book a Table</NavLink>
+            <NavLink href="/contact"     class="nav-link" ActiveClass="nav-active">Contact</NavLink>
+
+            @if (State.IsAuthenticated)
+            {
+                <NavLink href="@(State.IsAdmin ? "/admin" : "/dashboard")" class="nav-link nav-dash" ActiveClass="nav-active">
+                    @(State.IsAdmin ? "⚙️ Admin" : "👤 Dashboard")
+                </NavLink>
+                <button class="btn-ghost nav-btn" @onclick="Logout">Logout</button>
+            }
+            else
+            {
+                <button class="btn-primary nav-btn" @onclick="() => showAuth = true">Sign In</button>
+            }
+        </div>
+
+        <!-- Mobile hamburger -->
+        <button class="hamburger" @onclick="() => menuOpen = !menuOpen">
+            <span></span><span></span><span></span>
+        </button>
+    </nav>
+
+    <!-- PAGE CONTENT -->
+    <main class="main-content">
+        @Body
+    </main>
+
+    <!-- FOOTER (hidden on dashboard pages) -->
+    @if (!IsDashboardPage)
+    {
+        <Footer />
+    }
+
+    <!-- AUTH MODAL -->
+    @if (showAuth)
+    {
+        <AuthModal OnClose="() => showAuth = false" OnLogin="HandleLogin" />
+    }
+
+    <!-- TOAST -->
+    @if (State.ToastMessage != null)
+    {
+        <div class="toast toast-@State.ToastType">
+            <span>@(State.ToastType == "success" ? "✅" : "❌")</span>
+            @State.ToastMessage
+        </div>
+    }
+</div>
+
+@code {
+    bool showAuth = false;
+    bool menuOpen = false;
+
+    bool IsDashboardPage =>
+        Nav.Uri.Contains("/dashboard") || Nav.Uri.Contains("/admin");
+
+    protected override void OnInitialized()
+    {
+        State.OnChange += StateHasChanged;
+    }
+
+    void HandleLogin(AddictioonSnookerClub.Models.User user)
+    {
+        State.Login(user);
+        showAuth = false;
+        State.ShowToast($"Welcome back, {user.Name}! 🎱");
+        Nav.NavigateTo(user.Role == "admin" ? "/admin" : "/dashboard");
+    }
+
+    void Logout()
+    {
+        State.Logout();
+        Nav.NavigateTo("/");
+        State.ShowToast("Logged out successfully.");
+    }
+
+    public void Dispose() => State.OnChange -= StateHasChanged;
+}

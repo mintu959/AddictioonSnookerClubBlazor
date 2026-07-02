@@ -1,0 +1,50 @@
+# ═══════════════════════════════════════════════════════════
+# Addictioon Snooker Club — Hostinger .htaccess
+# Required for Blazor WebAssembly SPA routing
+# ═══════════════════════════════════════════════════════════
+
+# Force HTTPS
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Remove www (optional — remove these 3 lines if you want www)
+RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]
+
+# ── Blazor WASM SPA fallback ────────────────────────────────
+# All routes that don't match a real file fall back to index.html
+# This is what makes /book, /dashboard, /admin etc. work on refresh
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-l
+RewriteRule . /index.html [L]
+
+# ── WASM MIME types ─────────────────────────────────────────
+# Required so browsers accept .wasm files
+AddType application/wasm .wasm
+
+# ── Performance: cache static assets ────────────────────────
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType application/wasm              "access plus 1 year"
+    ExpiresByType application/javascript        "access plus 1 year"
+    ExpiresByType text/css                      "access plus 1 year"
+    ExpiresByType image/png                     "access plus 1 month"
+    ExpiresByType image/svg+xml                 "access plus 1 month"
+    ExpiresByType font/woff2                    "access plus 1 year"
+    ExpiresByType text/html                     "access plus 0 seconds"
+</IfModule>
+
+# ── Compression ─────────────────────────────────────────────
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json
+</IfModule>
+
+# ── Security headers ─────────────────────────────────────────
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

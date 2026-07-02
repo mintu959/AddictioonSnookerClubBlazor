@@ -1,0 +1,98 @@
+@page "/tournaments"
+@using AddictioonSnookerClub.Models
+@using AddictioonSnookerClub.Services
+@inject AppStateService State
+@inject TournamentService TournamentSvc
+
+<PageTitle>Tournaments – Addictioon Snooker Club</PageTitle>
+
+<div class="container page-container">
+    <div class="section-header">
+        <p class="section-eyebrow">Compete</p>
+        <h1 class="section-title">Tournaments</h1>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tab-row">
+        @foreach (var tab in Tabs)
+        {
+            <button class="tab-btn @(activeTab==tab?"tab-active":"")" @onclick="() => activeTab = tab">
+                @tab
+            </button>
+        }
+    </div>
+
+    <div class="tournament-grid">
+        @foreach (var t in FilteredTournaments)
+        {
+            <div class="card tournament-card">
+                <div class="tournament-top">
+                    <span class="badge @StatusClass(t.Status)">@t.Status</span>
+                    <span class="prize-badge">@t.PrizeMoney</span>
+                </div>
+                <h3 class="tournament-name">@t.Name</h3>
+                @if (t.Description != null)
+                {
+                    <p class="tournament-desc">@t.Description</p>
+                }
+                <p class="tournament-date">📅 @t.Date.ToString("dd MMM yyyy")</p>
+                <div class="progress-row">
+                    <div class="progress-bar">
+                        <div class="progress-fill"
+                             style="width:@((double)t.RegisteredPlayers/t.MaxPlayers*100)%">
+                        </div>
+                    </div>
+                    <span class="progress-label">@t.RegisteredPlayers / @t.MaxPlayers players</span>
+                </div>
+                @if (t.Winner != null)
+                {
+                    <p class="winner-label">🏆 Winner: @t.Winner</p>
+                }
+                @if (t.Status == TournamentStatus.Upcoming)
+                {
+                    @if (registeredIds.Contains(t.Id))
+                    {
+                        <button class="btn-ghost btn-full mt-2" disabled>✅ Registered</button>
+                    }
+                    else
+                    {
+                        <button class="btn-primary btn-full mt-2"
+                                @onclick="() => Register(t.Id)">
+                            Register — Free Entry
+                        </button>
+                    }
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    string activeTab = "Upcoming";
+    string[] Tabs = { "Upcoming", "Completed", "All" };
+    HashSet<int> registeredIds = new();
+
+    IEnumerable<Tournament> FilteredTournaments => activeTab switch
+    {
+        "Upcoming"  => State.Tournaments.Where(t => t.Status == TournamentStatus.Upcoming),
+        "Completed" => State.Tournaments.Where(t => t.Status == TournamentStatus.Completed),
+        _           => State.Tournaments,
+    };
+
+    string StatusClass(TournamentStatus s) => s switch
+    {
+        TournamentStatus.Upcoming  => "badge-green",
+        TournamentStatus.Live      => "badge-red",
+        TournamentStatus.Completed => "badge-gold",
+        _ => ""
+    };
+
+    void Register(int id)
+    {
+        if (TournamentSvc.Register(id, "You"))
+        {
+            registeredIds.Add(id);
+            State.ShowToast("Successfully registered! See you on the table. 🎱");
+        }
+    }
+}

@@ -1,0 +1,71 @@
+@page "/about"
+<PageTitle>About – Addictioon Snooker Club</PageTitle>
+
+<div class="container page-container">
+    <div class="section-header">
+        <p class="section-eyebrow">Our Story</p>
+        <h1 class="section-title">About Addictioon</h1>
+        <p class="section-sub">
+            Founded in 2018, Addictioon Snooker Club was born from a simple belief: that snooker deserves
+            a proper home in Nagpur. We built a space where beginners find their footing and champions hone their craft.
+        </p>
+    </div>
+
+    <div class="facility-grid">
+        @foreach (var f in Facilities)
+        {
+            <div class="card facility-card">
+                <div class="facility-icon">@f.icon</div>
+                <h3 class="facility-title">@f.title</h3>
+                <p class="facility-desc">@f.desc</p>
+            </div>
+        }
+    </div>
+
+    <div class="card mission-card">
+        <h2 class="mission-title">Our Mission</h2>
+        <p class="mission-text">
+            To create India's finest snooker community — accessible, competitive, and welcoming to everyone
+            from curious first-timers to aspiring professionals. We invest in equipment, training, and
+            tournaments so our members can pursue the game at every level.
+        </p>
+    </div>
+
+    <div class="card mission-card mt-2">
+        <h2 class="mission-title">Club History</h2>
+        <div class="timeline">
+            <div class="timeline-item">
+                <span class="timeline-year">2018</span>
+                <p>Addictioon opens with 4 tables near Besa Chowk, Pipla Road, Nagpur.</p>
+            </div>
+            <div class="timeline-item">
+                <span class="timeline-year">2020</span>
+                <p>Expanded to 8 tables. VIP lounge added. Membership programme launched.</p>
+            </div>
+            <div class="timeline-item">
+                <span class="timeline-year">2022</span>
+                <p>First inter-club tournament. 200+ members registered. Coaching programme begins.</p>
+            </div>
+            <div class="timeline-item">
+                <span class="timeline-year">2024</span>
+                <p>Online booking system live. 1,000+ members. Hosted Maharashtra State Open.</p>
+            </div>
+            <div class="timeline-item">
+                <span class="timeline-year">2026</span>
+                <p>New website, loyalty rewards system, and digital membership cards launched.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    readonly (string icon, string title, string desc)[] Facilities = new[]
+    {
+        ("🎱","8 Professional Tables",      "Full-size Riley & BCE tables with tournament-grade Hainsworth cloth, maintained daily."),
+        ("👑","VIP Lounges",                "Two private VIP rooms for corporate events, coaching sessions, or a premium solo experience."),
+        ("☕","Café & Bar",                 "Freshly brewed coffee, snacks, and a fully stocked bar — open during all club hours."),
+        ("🅿️","Free Parking",              "20 dedicated spots with 24×7 CCTV — free for all members and guests."),
+        ("❄️","Air Conditioning",           "Climate-controlled throughout. Focus on your game regardless of the season."),
+        ("💡","Professional Lighting",      "Custom billiard lighting on every table, eliminating shadows and glare completely."),
+    };
+}

@@ -1,0 +1,137 @@
+@page "/contact"
+@using AddictioonSnookerClub.Services
+@inject AppStateService State
+
+<PageTitle>Contact – Addictioon Snooker Club</PageTitle>
+
+<div class="container page-container">
+    <div class="section-header">
+        <h1 class="section-title">Get in Touch</h1>
+        <p class="section-sub">We'd love to hear from you. Drop by, call, or send a message anytime.</p>
+    </div>
+
+    <div class="contact-grid">
+        <!-- Form -->
+        <div>
+            @if (sent)
+            {
+                <div class="card text-center">
+                    <div style="font-size:3rem;margin-bottom:1rem">✅</div>
+                    <h3 style="color:#2ECC71">Message Sent!</h3>
+                    <p style="color:#8B8BA7">We'll get back to you within 24 hours.</p>
+                    <button class="btn-ghost mt-2" @onclick="() => sent = false">Send Another</button>
+                </div>
+            }
+            else
+            {
+                <div class="card">
+                    <h3 class="card-title">Send a Message</h3>
+                    <div class="form-group">
+                        <label>Your Name</label>
+                        <input class="form-input" @bind="name" placeholder="Rahul Sharma" />
+                        <label>Email</label>
+                        <input class="form-input" type="email" @bind="email" placeholder="rahul@example.com" />
+                        <label>Message</label>
+                        <textarea class="form-input form-textarea" @bind="message"
+                                  placeholder="How can we help?" rows="5"></textarea>
+
+                        @if (error != null)
+                        {
+                            <p class="form-error">@error</p>
+                        }
+
+                        <button class="btn-primary btn-full mt-2" @onclick="Submit">
+                            Send Message
+                        </button>
+                    </div>
+                </div>
+            }
+
+            <!-- Embedded Google Map -->
+            <div class="card map-card mt-2">
+                <h3 class="card-title">Find Us</h3>
+                <div class="map-embed-wrapper">
+                    <iframe
+                        title="Addictioon Snooker Club Location"
+                        src="@State.Business.EmbedMapUrl"
+                        width="100%" height="280"
+                        style="border:0; border-radius:12px;"
+                        allowfullscreen="true"
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+                <a href="@State.Business.GoogleMapsUrl" target="_blank" rel="noopener noreferrer"
+                   class="btn-ghost btn-full mt-2">
+                    📍 Open in Google Maps
+                </a>
+            </div>
+        </div>
+
+        <!-- Info -->
+        <div class="contact-info">
+            <div class="card contact-info-card">
+                <span class="contact-info-icon">📍</span>
+                <div>
+                    <p class="contact-info-label">Address</p>
+                    <p class="contact-info-value">@State.Business.Address</p>
+                    <a href="@State.Business.GoogleMapsUrl" target="_blank" rel="noopener noreferrer"
+                       class="contact-info-link">Get Directions →</a>
+                </div>
+            </div>
+
+            <div class="card contact-info-card">
+                <span class="contact-info-icon">📞</span>
+                <div>
+                    <p class="contact-info-label">Phone</p>
+                    <a href="tel:@State.Business.PhoneRaw" class="contact-info-value contact-info-link-inline">
+                        @State.Business.Phone
+                    </a>
+                </div>
+            </div>
+
+            <div class="card contact-info-card">
+                <span class="contact-info-icon">📧</span>
+                <div>
+                    <p class="contact-info-label">Email</p>
+                    <a href="mailto:@State.Business.Email" class="contact-info-value contact-info-link-inline">
+                        @State.Business.Email
+                    </a>
+                </div>
+            </div>
+
+            <div class="card contact-info-card">
+                <span class="contact-info-icon">🕐</span>
+                <div>
+                    <p class="contact-info-label">Business Hours</p>
+                    <p class="contact-info-value">@State.Business.Hours</p>
+                </div>
+            </div>
+
+            <div class="card social-card">
+                <p class="contact-info-label">Follow Us</p>
+                <a href="@State.Business.InstagramUrl" target="_blank" rel="noopener noreferrer" class="instagram-link">
+                    <span class="social-icons">
+                        <span title="Instagram">📸</span>
+                    </span>
+                    <span class="instagram-handle">@State.Business.InstagramHandle</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    string name = "", email = "", message = "";
+    bool sent = false;
+    string? error;
+
+    void Submit()
+    {
+        error = null;
+        if (string.IsNullOrWhiteSpace(name))    { error = "Name is required."; return; }
+        if (string.IsNullOrWhiteSpace(email))   { error = "Email is required."; return; }
+        if (string.IsNullOrWhiteSpace(message)) { error = "Message is required."; return; }
+        sent = true;
+    }
+}

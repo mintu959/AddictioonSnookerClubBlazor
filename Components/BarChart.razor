@@ -1,0 +1,44 @@
+@namespace AddictioonSnookerClub.Components
+@using AddictioonSnookerClub.Models
+
+<div class="chart-wrapper">
+    <svg viewBox="0 0 @(Data.Count * 60) @Height" class="bar-chart">
+        <defs>
+            @for (int i = 0; i < Data.Count; i++)
+            {
+                var idx = i;
+                <linearGradient id="bar-@idx" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#2ECC71" />
+                    <stop offset="100%" stop-color="#1A7A44" />
+                </linearGradient>
+            }
+        </defs>
+
+        @{
+            var max = Data.Max(d => d.Amount);
+            var chartH = Height - 40;
+        }
+
+        @for (int i = 0; i < Data.Count; i++)
+        {
+            var d = Data[i];
+            var barH = max > 0 ? (double)d.Amount / max * chartH : 0;
+            var x = i * 60 + 10;
+            var y = Height - 30 - barH;
+            var idx = i;
+
+            <g>
+                <rect x="@x" y="@y" width="40" height="@barH" rx="4" fill="url(#bar-@idx)" />
+                <text x="@(x+20)" y="@(Height-10)" text-anchor="middle" class="chart-label">@d.Month</text>
+                <text x="@(x+20)" y="@(y-4)" text-anchor="middle" class="chart-value">
+                    @((d.Amount / 1000).ToString("0"))k
+                </text>
+            </g>
+        }
+    </svg>
+</div>
+
+@code {
+    [Parameter] public List<RevenueData> Data { get; set; } = new();
+    [Parameter] public int Height { get; set; } = 180;
+}

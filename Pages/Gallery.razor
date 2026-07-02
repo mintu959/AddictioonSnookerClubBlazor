@@ -1,0 +1,43 @@
+@page "/gallery"
+@using AddictioonSnookerClub.Services
+@inject AppStateService State
+
+<PageTitle>Gallery – Addictioon Snooker Club</PageTitle>
+
+<div class="container page-container">
+    <div class="section-header">
+        <h1 class="section-title">Gallery</h1>
+        <p class="section-sub">A glimpse into life at Addictioon.</p>
+    </div>
+
+    <!-- Category filter -->
+    <div class="filter-row">
+        @foreach (var cat in Categories)
+        {
+            <button class="filter-btn @(activeFilter==cat?"filter-active":"")"
+                    @onclick="() => activeFilter = cat">
+                @cat.ToUpper()
+            </button>
+        }
+    </div>
+
+    <div class="gallery-grid">
+        @foreach (var item in FilteredItems)
+        {
+            <div class="gallery-item">
+                <div class="gallery-emoji">@item.Emoji</div>
+                <div class="gallery-label">@item.Label</div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    string activeFilter = "all";
+    string[] Categories = { "all", "facility", "events" };
+
+    IEnumerable<AddictioonSnookerClub.Models.GalleryItem> FilteredItems =>
+        activeFilter == "all"
+            ? State.GalleryItems
+            : State.GalleryItems.Where(i => i.Category == activeFilter);
+}

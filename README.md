@@ -2,7 +2,9 @@
 Addictioon Snooker Club — Blazor WebAssembly (.NET 8)  A dark‑themed, fully responsive snooker club web app built with Blazor WebAssembly and pure CSS. Features include table booking, membership plans, tournaments, testimonials, and an admin dashboard.
 
 Author: Mithilesh Pandey
+
 ---
+
 ## ✅ Tech Stack
 
 | Layer        | Technology                          |
@@ -65,7 +67,7 @@ AddictioonSnookerClub/
 
 ---
 
-## 🚀 Local Setup 
+## 🚀 Local Setup (5 minutes)
 
 ### Prerequisites
 - [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
@@ -74,7 +76,7 @@ AddictioonSnookerClub/
 
 ```bash
 # 1. Clone / place the project folder, then:
-cd AddictioonSnookerNew
+cd AddictioonSnookerClub
 
 # 2. Restore packages
 dotnet restore
@@ -86,22 +88,86 @@ dotnet watch run
 #    http://localhost:5000
 ```
 
+### Build for production
+
+```bash
+dotnet publish -c Release -o ./publish
+```
+
+The `./publish/wwwroot` folder is what you upload to Hostinger.
+
+---
+
+## 🌐 Deploy to Hostinger (addictionsnookerclub.in)
+
+### Step 1 — Build
+```bash
+dotnet publish -c Release -o ./publish
+```
+Your deployable files are in: `./publish/wwwroot/`
+
+### Step 2 — Log in to Hostinger hPanel
+Go to [hpanel.hostinger.com](https://hpanel.hostinger.com) → **Manage** your hosting plan.
+
+### Step 3 — Check DNS
+**Domains → addictionsnookerclub.in → DNS Zone**
+
+Ensure an A record points to your Hostinger IP:
+```
+Type  Name  Value
+A     @     31.220.x.x   (your Hostinger server IP, shown on hPanel home)
+```
+
+### Step 4 — Upload files
+1. Go to **Files → File Manager → public_html**
+2. Delete the Hostinger placeholder `index.html`
+3. Upload **all contents** of `./publish/wwwroot/` into `public_html/`
+
+Your `public_html/` should look like:
+```
+public_html/
+├── index.html          ← must be here at root
+├── .htaccess           ← critical for SPA routing
+├── service-worker.js
+├── css/
+│   └── app.css
+└── _framework/         ← Blazor WASM runtime (auto-generated on publish)
+    ├── blazor.webassembly.js
+    ├── dotnet.wasm
+    └── ...
+```
+
+### Step 5 — Enable SSL
+**Security → SSL → addictionsnookerclub.in → Install** (free Let's Encrypt).
+Wait 10–15 minutes. HTTPS is forced automatically via `.htaccess`.
+
+### Step 6 — Test
+Visit `https://addictionsnookerclub.in` and verify:
+- ✅ Home page loads with animated hero
+- ✅ Navigation works (About, Pricing, Book, etc.)
+- ✅ Refreshing `/book` or `/dashboard` doesn't 404
+- ✅ Admin login: use email containing `admin` (e.g. `admin@test.com`)
+- ✅ Member login: any other email
+- ✅ HTTPS padlock shown
+
+---
+
 ## 👤 Demo Credentials
 
 | Role   | Email pattern        | Access                    |
-|--------|----------------------|---------------------------|
+|--------|---------------------|---------------------------|
 | Admin  | `admin@anything.com` | Full admin dashboard      |
 | Staff  | `staff@anything.com` | Staff-level access        |
 | Member | any other email      | Member dashboard          |
 
 ---
 
-## 🔄 Future Upgrades:
+## 🔄 Future Upgrades (production)
 
 | Feature               | How to add                                        |
 |----------------------|--------------------------------------------------|
 | Real authentication  | Add **ASP.NET Core Identity** or **Auth0**       |
-| Database             | Replace mock services with **Entity Framework** + SQL (MySQL or Azure SQL) |
+| Database             | Replace mock services with **Entity Framework** + SQL (Hostinger MySQL or Azure SQL) |
 | Email notifications  | **SendGrid** or **Mailgun** via API              |
 | Payments             | **Razorpay** JS SDK called via `IJSRuntime`      |
 | Real-time updates    | **SignalR** (requires upgrading to Hostinger VPS or Azure) |
@@ -112,4 +178,4 @@ dotnet watch run
 ## 📄 License
 MIT — free to use, modify, and deploy.
 
-Built for **Addictioon Snooker Club**, Nagpur 🎱
+Built for **Addictioon Snooker Club**, Mumbai 🎱
